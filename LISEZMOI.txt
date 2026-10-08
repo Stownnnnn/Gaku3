@@ -1,0 +1,70 @@
+CROC — VARIANTE « JEU VIDÉO RÉTRO » (JRPG 16-bit)
+=================================================
+
+Le monde tel que Croc le perçoit : un vieux jeu de rôle 16-bit.
+Écran titre « APPUIE SUR START », menu de pause, boîtes de dialogue,
+scène à explorer, combat, jingle de titre, album pixelisé, sauvegarde.
+Aucune installation, aucun fichier son : musique et bruitages sont
+fabriqués en direct par le navigateur.
+
+CONTENU DU DOSSIER
+- index.html, style.css, app.js : le site (ne pas renommer).
+- data.js : TOUT le contenu de la fiche (textes, stats, compétences…).
+- images/ : les 5 illustrations.
+- .nojekyll : fichier vide utile à GitHub Pages (laisse-le).
+- LISEZMOI.txt : ce fichier.
+
+
+METTRE EN LIGNE SUR GITHUB PAGES
+1. Si tu as reçu un .zip, dézippe-le d'abord (GitHub n'affiche pas un .zip comme site).
+2. Sur github.com : bouton « + » en haut à droite > « New repository ».
+   Nom : par exemple « croc » · visibilité : Public · « Create repository ».
+3. Dans le dépôt vide, clique sur le lien « uploading an existing file »
+   (ou plus tard : « Add file » > « Upload files »).
+   Glisse le CONTENU du dossier (index.html, style.css, app.js, data.js,
+   LISEZMOI.txt, .nojekyll et le dossier images/), pas le dossier lui-même.
+   Astuce : le fichier .nojekyll est « caché » sur certains ordinateurs ;
+   s'il n'apparaît pas, ce n'est pas grave, le site fonctionne sans.
+4. En bas de la page : « Commit changes ».
+5. Onglet « Settings » > « Pages » (menu de gauche) > « Build and deployment » :
+   Source = « Deploy from a branch » · Branch = « main » · dossier « / (root) » · « Save ».
+6. Attends 1 à 2 minutes puis recharge la page « Pages » : l'adresse s'affiche en haut,
+   du type https://TON-PSEUDO.github.io/croc/
+
+
+MODIFIER LE CONTENU (data.js)
+- Sur GitHub : clique sur data.js > icône crayon (Edit) > modifie > « Commit changes ».
+  Le site se met à jour en une minute environ (recharge la page, au besoin Ctrl+F5).
+- Garde bien les guillemets et les virgules : chaque texte est entre '…' et suivi d'une virgule.
+  Pour écrire une apostrophe dans un texte entre '…', mets un \ devant : 'l\'arme'.
+- Ce que lit chaque écran :
+  · STATUT : nom, sousTitre, champs (identité), physique, stats (sur 20, « bonus » optionnel), rolls (sur 100).
+  · PSYCHÉ : psycho (les 4 textes du journal) et frere (le seul qui n'est pas un NPC).
+  · COMPÉTENCES : competences (Lien Infortuné : niveaux, coût, préavis, condition, spécial, « des » = faces du dé)
+    et catastrophes (liste d'exemples tirés au hasard pendant la simulation).
+  · TITRES : titres (nom, condition, effet).
+  · ALBUM : galerie (chemin de l'image + description).
+  · Écran de démarrage : boot (les lignes du Système).
+- Ajouter une image : « Add file » > « Upload files » dans le dossier images/,
+  puis ajoute une ligne dans « galerie » : { src: 'images/mon-image.jpg', alt: 'description' },
+- Tout en bas de data.js, le bloc « retro » contient les répliques génériques des PNJ
+  de l'écran PSYCHÉ (ce ne sont pas des faits sur Croc). Modifie-les librement.
+
+
+À SAVOIR
+- Le son ne démarre qu'après un clic ou la touche Entrée sur START (règle des navigateurs).
+  « JOUER SANS SON » démarre en silence ; le bouton « ♪ SON » (ou la touche M) coupe/remet le son.
+- Clavier : flèches + Entrée dans les menus, Échap pour revenir au menu ou passer un dialogue.
+  Dans PSYCHÉ : flèches ou ZQSD pour marcher, Entrée pour parler. Souris et tactile aussi.
+- Bouton « CRT » : active/désactive l'effet d'écran cathodique (lignes de balayage).
+- Si ton système demande de réduire les animations, tremblements, flashs et transitions sont coupés.
+- Rendu « TRAMÉ 16 COUL. » de l'album : il fonctionne une fois le site en ligne. Si tu ouvres
+  index.html directement depuis ton ordinateur, le navigateur bloque la lecture des pixels
+  et l'album affiche le rendu PIXEL à la place (c'est normal).
+- SAUVEGARDER : la partie (chaos, catastrophes, temps…) est gardée dans TON navigateur
+  uniquement ; « Exporter une capture » télécharge une image PNG de la sauvegarde.
+- Rien n'a été inventé sur Croc : nom et prénom restent « ??? ». L'apparence d'Eilyn n'étant pas
+  décrite, il apparaît comme une silhouette lumineuse. Les catastrophes de la simulation et le dé
+  de 1 à 100 du niveau 5 viennent de data.js (« catastrophes » et « des ») : ajuste-les si besoin.
+- Illustrations : fan arts, droits réservés à leurs auteurs. Si tu connais les artistes,
+  ajoute leurs noms dans la phrase du pied de page (index.html, classe « credit »).

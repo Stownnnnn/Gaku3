@@ -743,7 +743,7 @@ SCREENS.psyche={song:'monde',mount(p){
   if(!G.journal[1])await unlock(1);
   const j=await choose();
   if(j==='mauvais'){await ow.smash(n);addChaos();SFX.chaos();judged++;$('#owJ',p).textContent=judged;$('#owC',p).textContent=G.chaos;
-   await DLG.say([{who:'sys',t:'[SYSTÈME] CHAOS +1. La frontière entre bon et mauvais NPC était très mince.'}]);if(!G.journal[3])await unlock(3)}
+   await DLG.say([{who:'sys',t:'[SYSTÈME] CHAOS +1. La frontière entre bon et mauvais NPC est très mince chez Croc.'}]);if(!G.journal[3])await unlock(3)}
   else if(j==='bon'){ow.bless(n);judged++;$('#owJ',p).textContent=judged;await DLG.say([{who:'sys',t:'[SYSTÈME] Jugement enregistré : bon NPC. Pour l\'instant.'}])}
  }});
  if(!G.journal[0]||!G.met.psyche){G.met.psyche=true;DLG.say([{who:'sys',t:'[SYSTÈME] Chargement de la vue subjective…'}]);unlock(0)}

@@ -75,3 +75,12 @@ MODIFIER LE CONTENU (data.js)
   sinon l'adversaire compte pour le rechargement. Un nouvel adversaire apparaît ensuite.
 - Réglages par niveau dans data.js (competences > Accumulation du Chaos > niveaux) :
   cout, recharge, bonus (renfort par marque en %), marques (posées par rechargement).
+
+RELATIONS (nouvel écran du menu)
+- Tout se règle dans data.js, bloc « relations » (un exemple à copier est en commentaire) :
+  nom, role, statut ('ALLIÉ' / 'NEUTRE' / 'ENNEMI' / 'INCONNU', ou null),
+  npc (false = Croc ne le voit pas comme un NPC, comme Eilyn), affinite (0 à 100 → cœurs, ou null),
+  citation (dite quand on clique sur PARLER, Croc répond « …… »), portrait ('images/xxx.jpg' ou null),
+  rencontre, derniereMaj, note.
+- relationsCases : nombre de cases affichées (les vides sont grisées).
+- Filtres par statut et tri par affinité dans l'écran.

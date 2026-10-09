@@ -101,6 +101,7 @@ const ICONS={
  competences:[".....xx..","....xx...","...xx....","..xxxxx..","....xx...","...xx....","..xx.....",".xx......","........."],
  titres:[".........","a...a...a","aa.aaa.aa","aaaaaaaaa","axaaxaaxa","aaaaaaaaa",".........","aaaaaaaaa","........."],
  album:["aaaaaaaaa","a.......a","a.....x.a","a.......a","a..d....a","a.ddd.d.a","addddddda","aaaaaaaaa","........."],
+ relations:["..a...x..",".aaa.xxx.",".aaa.xxx.","..a...x..",".aaa.xxx.","aaaaxxxxx","aaaaxxxxx","aaaaxxxxx","........."],
  sauvegarder:["aaaaaaaa.","a.dddd.aa","a.dddd..a","a.......a","a.aaaaa.a","a.a...a.a","a.a...a.a","aaaaaaaaa","........."]
 };
 function frameURI(c1,c2,c3,c4){
@@ -743,7 +744,7 @@ SCREENS.psyche={song:'monde',mount(p){
   if(!G.journal[1])await unlock(1);
   const j=await choose();
   if(j==='mauvais'){await ow.smash(n);addChaos();SFX.chaos();judged++;$('#owJ',p).textContent=judged;$('#owC',p).textContent=G.chaos;
-   await DLG.say([{who:'sys',t:'[SYSTÈME] CHAOS +1. La frontière entre bon et mauvais NPC est très mince chez Croc.'}]);if(!G.journal[3])await unlock(3)}
+   await DLG.say([{who:'sys',t:'[SYSTÈME] CHAOS +1. La frontière entre bon et mauvais NPC était très mince.'}]);if(!G.journal[3])await unlock(3)}
   else if(j==='bon'){ow.bless(n);judged++;$('#owJ',p).textContent=judged;await DLG.say([{who:'sys',t:'[SYSTÈME] Jugement enregistré : bon NPC. Pour l\'instant.'}])}
  }});
  if(!G.journal[0]||!G.met.psyche){G.met.psyche=true;DLG.say([{who:'sys',t:'[SYSTÈME] Chargement de la vue subjective…'}]);unlock(0)}
@@ -944,7 +945,7 @@ SCREENS.competences={song:'combat',mount(p){
   await sleep(350);
   if(spared){bt.pop('ÉPARGNÉ','croc',COL.ice)}else{bt.hurt('croc');bt.pop('VICTIME','croc',COL.blood2);SFX.hit()}
   G.cata++;$('#btCata',p).textContent=G.cata;hud();
-  await msg(spared?`[SYSTÈME] Dé : ${roll} (< 20). Seule la cible est incluse dans la catastrophe.`:(roll!=null?`[SYSTÈME] Dé : ${roll}. L'utilisateur est compté parmi les victimes.`:"[SYSTÈME] L'utilisateur est compté parmi les victimes."));
+  await msg(spared?`[SYSTÈME] Dé : ${roll} (< 20). Seule la cible est incluse dans la catastrophe.`:(roll!=null?`[SYSTÈME] Dé : ${roll}. L'utilisateur est compté parmi les victimes..`:"[SYSTÈME] L'utilisateur est compté parmi les victimes.."));
   await bt.link(false);mus('combat');lock(false);
  }
  const fr=v=>String(Math.round(v*10)/10).replace('.',',');
@@ -990,6 +991,70 @@ SCREENS.competences={song:'combat',mount(p){
  cm.addEventListener('click',e=>{const b=e.target.closest('.cmd');if(!b||busy)return;const c=b.dataset.c;const r=wrap.getBoundingClientRect();if(r.top<0||r.bottom>innerHeight)wrap.scrollIntoView({block:r.height<innerHeight-20?'center':'start',behavior:RM?'auto':'smooth'});(c==='lien'?lien:c==='chaos'?chaos:c==='marteau'?marteau:repos)().catch(err=>{console.error(err);lock(false)})});
  msg(`[SYSTÈME] Une cible apparaît. Choisis une commande.`);
  return()=>{bt.destroy();mtok++};
+}};
+
+/* =====================================================================
+   RELATIONS — carnet des contacts (data.js > relations)
+   ===================================================================== */
+const HEART_ROWS=[".xx.xx.","xbxxxxx","xxxxxxx",".xxxxx.","..xxx..","...x..."];
+const HEART_HALF=[".xx.vv.","xbxvvvv","xxxvvvv",".xxvvv.","..xvv..","...v..."];
+const HEART_URI={full:spriteURI(HEART_ROWS,{x:COL.blood2,b:COL.white}),half:spriteURI(HEART_HALF,{x:COL.blood2,b:COL.white,v:COL.vio}),empty:spriteURI(HEART_ROWS,{x:COL.vio,b:COL.vio2})};
+const REL_ST=s=>{const u=String(s||'').toUpperCase();if(!u)return{k:'nd',g:'—',l:'NON DÉFINI'};if(u.includes('ALLI'))return{k:'allie',g:'●',l:'ALLIÉ'};if(u.includes('NEUTRE'))return{k:'neutre',g:'◆',l:'NEUTRE'};if(u.includes('ENNEMI'))return{k:'ennemi',g:'▲',l:'ENNEMI'};return{k:'inconnu',g:'?',l:'INCONNU'}};
+function relHash(s){let h=7;for(const c of String(s))h=(h*31+c.charCodeAt(0))>>>0;return h}
+function relPortrait(cv,r,size){
+ const x=cv.getContext('2d');cv.width=size;cv.height=size;x.imageSmoothingEnabled=false;
+ x.fillStyle=COL.night;x.fillRect(0,0,size,size);for(let y=0;y<size;y+=2)for(let i=(y/2)%2;i<size;i+=2)if(bay(i,y)<.25){x.fillStyle=COL.deep;x.fillRect(i,y,1,1)}
+ const isFr=r.npc===false;
+ const drawSp=()=>{const sp=isFr?sprite('eilyn0',NPC_ROWS,EILYN_PAL):npcSprite(relHash(r.nom)%NPC_PALS.length,0);const k=Math.max(1,Math.floor(size*.8/sp.height));const w=sp.width*k,h=sp.height*k,ox=Math.round((size-w)/2),oy=size-h;
+  if(isFr){x.globalAlpha=.45;for(const[dx,dy]of[[-1,0],[1,0],[0,-1]])x.drawImage(tinted('eil',sp,COL.ice),ox+dx*k,oy+dy*k,w,h);x.globalAlpha=1}
+  x.drawImage(sp,ox,oy,w,h)};
+ if(r.portrait){loadImg(r.portrait).then(im=>{const s=Math.min(im.naturalWidth,im.naturalHeight);const c=pixelArt(im,size,{crop:[(im.naturalWidth-s)/2,0,s,s],h:size,dither:true});x.drawImage(c,0,0)}).catch(drawSp)}else drawSp();
+}
+function relHearts(a){if(a==null||a==='')return`<span class="rl-noaff">NON ÉVALUÉE</span>`;const v=Math.max(0,Math.min(100,+a||0));let o='';for(let i=0;i<10;i++){const f=v-i*10;o+=`<i style="background-image:url('${f>=10?HEART_URI.full:f>=5?HEART_URI.half:HEART_URI.empty}')"></i>`}return`<span class="rl-hearts" aria-label="Affinité ${v} sur 100">${o}</span><b class="rl-affv">${v}</b>`}
+SCREENS.relations={song:'menu',mount(p){
+ const R=Array.isArray(D.relations)?D.relations:[];const cases=Math.max(R.length,+D.relationsCases||6);
+ const FIL=[['tous','TOUS'],['allie','ALLIÉS'],['neutre','NEUTRES'],['ennemi','ENNEMIS'],['inconnu','INCONNUS']];
+ let fil='tous',tri=0,sel=R.length?0:-1;const TRI=['ORDRE','AFFINITÉ ▼','AFFINITÉ ▲'];
+ p.innerHTML=head('RELATIONS',`[SYSTÈME] ${R.length} contact${R.length>1?'s':''} enregistré${R.length>1?'s':''}`)+`
+ <div class="rl-bar"><div class="rl-fil" role="group" aria-label="Filtrer">${FIL.map(([k,l])=>`<button type="button" data-f="${k}" aria-pressed="${k==='tous'}">${l}</button>`).join('')}</div>
+  <button type="button" class="rl-tri" id="rlTri" aria-label="Changer le tri">TRI : <b>${TRI[0]}</b></button></div>
+ <div class="rl-grid"><div class="rl-list" id="rlList" role="list"></div><div class="box rl-det" id="rlDet" aria-live="polite"></div></div>
+ <p class="sim-note">Vue de ${esc(D.nom||'Croc')} : tout le monde est un NPC, sauf ${esc(D.frere||'son frère')}.</p>`;
+ const list=$('#rlList',p),det=$('#rlDet',p);
+ function order(){let ix=R.map((r,i)=>i).filter(i=>fil==='tous'||REL_ST(R[i].statut).k===fil);
+  if(tri){ix.sort((a,b)=>{const va=R[a].affinite,vb=R[b].affinite;if(va==null&&vb==null)return a-b;if(va==null)return 1;if(vb==null)return-1;return tri===1?vb-va:va-vb})}return ix}
+ function drawList(){
+  const ix=order();let h='';
+  ix.forEach(i=>{const r=R[i],st=REL_ST(r.statut);h+=`<button type="button" role="listitem" class="rl-card st-${st.k}${r.npc===false?' fr':''}" data-i="${i}" aria-pressed="${i===sel}"><canvas aria-hidden="true"></canvas><span class="t"><span class="n">${esc(r.nom||'???')}</span><span class="r">${esc(r.role||'')}</span></span><span class="g" title="${st.l}">${st.g}</span><span class="tag">${r.npc===false?'♥':'NPC'}</span></button>`});
+  const empty=fil==='tous'?cases-R.length:0;for(let k=0;k<empty;k++)h+=`<button type="button" role="listitem" class="rl-card vide" data-i="-1" aria-label="Case vide"><span class="t"><span class="n">???</span><span class="r">— case libre —</span></span></button>`;
+  if(!ix.length&&!empty)h=`<p class="rl-none">[SYSTÈME] Aucun contact dans cette catégorie.</p>`;
+  list.innerHTML=h;$$('.rl-card canvas',list).forEach(cv=>relPortrait(cv,R[+cv.parentElement.dataset.i],32));
+ }
+ function drawDet(){
+  const r=R[sel];if(!r){det.innerHTML=`<p class="rl-none">[SYSTÈME] Aucun contact enregistré.</p>`;return}
+  const st=REL_ST(r.statut);const row=(l,v)=>v?`<div><span class="lbl">${l}</span><b>${esc(v)}</b></div>`:'';
+  det.className='box rl-det st-'+st.k+(r.npc===false?' fr':'');
+  det.innerHTML=`<div class="rl-top"><canvas class="rl-big" aria-hidden="true"></canvas><div class="rl-id"><p class="rl-nm">${esc(r.nom||'???')}</p><p class="rl-role">${esc(r.role||'')}</p>
+   <p class="rl-badges"><span class="rl-st">${st.g} ${st.l}</span><span class="rl-view">${r.npc===false?'♥ NON-NPC':'[NPC]'}</span></p></div></div>
+   <div class="rl-aff"><span class="lbl">AFFINITÉ</span>${relHearts(r.affinite)}</div>
+   <div class="rl-rows">${row('RENCONTRE',r.rencontre)}${row('DERNIÈRE INTERACTION',r.derniereMaj)}</div>
+   ${r.note?`<div class="rl-note"><span class="lbl">NOTE DU SYSTÈME</span>${esc(r.note)}</div>`:''}
+   <div class="rl-act"><button type="button" class="pbtn" id="rlTalk">▶ PARLER</button></div>`;
+  relPortrait($('.rl-big',det),r,64);
+  $('#rlTalk',det).onclick=()=>{SFX.ok();const nm=String(r.nom||'???').toUpperCase();
+   const L=r.citation?[{who:'pnj',name:nm,t:r.citation,pal:relHash(r.nom)%NPC_PALS.length},{who:'croc'}]:[{who:'sys',t:`[SYSTÈME] Aucune réplique enregistrée pour ${r.nom||'ce contact'}.`},{who:'croc'}];
+   DLG.say(L)};
+ }
+ function selRel(i,sound=true){if(i<0){SFX.err();return}sel=i;$$('.rl-card',list).forEach(b=>b.setAttribute('aria-pressed',+b.dataset.i===i));drawDet();if(sound){R[i]&&R[i].npc===false?SFX.heart():SFX.ok()}
+  if(innerWidth<=820){const t=det.getBoundingClientRect().top;if(t>innerHeight*.7)det.scrollIntoView({behavior:RM?'auto':'smooth',block:'start'})}}
+ drawList();drawDet();
+ rove(list,'.rl-card',{});list.addEventListener('focusin',e=>{const b=e.target.closest('.rl-card');if(b&&+b.dataset.i>=0&&+b.dataset.i!==sel)selRel(+b.dataset.i,false)});
+ list.addEventListener('click',e=>{const b=e.target.closest(".rl-card");if(b)selRel(+b.dataset.i)});
+ list.addEventListener('mouseover',e=>{const b=e.target.closest('.rl-card');if(b&&b.dataset.h!=='1'){$$('.rl-card',list).forEach(c=>c.dataset.h='');b.dataset.h='1';SFX.move()}});
+ const fb=$('.rl-fil',p);rove(fb,'button',{vertical:false});
+ fb.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;fil=b.dataset.f;$$('button',fb).forEach(x=>x.setAttribute('aria-pressed',x===b));SFX.move();drawList();const ix=order();if(ix.length&&!ix.includes(sel))selRel(ix[0],false)});
+ $('#rlTri',p).onclick=()=>{tri=(tri+1)%3;$('#rlTri b',p).textContent=TRI[tri];SFX.ok();drawList()};
+ return()=>{};
 }};
 
 /* =====================================================================

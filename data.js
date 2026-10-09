@@ -102,6 +102,29 @@ catastrophes: [
   'Pont rompu', 'Stampede de monstres', 'Court-circuit en chaîne', 'Éboulement',
 ],
 
+/* RELATIONS — écran RELATIONS du menu.
+   Pour ajouter quelqu'un : copie un bloc { ... } et change les valeurs.
+   statut   : 'ALLIÉ' | 'NEUTRE' | 'ENNEMI' | 'INCONNU' (couleur et icône automatiques), null = non défini
+   npc      : false = Croc ne le voit PAS comme un NPC (sinon, laisse true)
+   affinite : 0 à 100 (affichée en cœurs), ou null si non évaluée
+   portrait : 'images/mon-image.jpg' (rendue en pixel art), ou null pour un sprite
+   citation, rencontre, derniereMaj, note : texte, ou null pour ne rien afficher */
+relations: [
+  {
+    nom: 'Eilyn', role: 'Frère', statut: null, npc: false, affinite: null,
+    citation: null, portrait: null, rencontre: null, derniereMaj: null,
+    note: "Le seul que Croc ne voit pas comme un NPC, à cause des circonstances inhabituelles de leur naissance.",
+  },
+  /* Exemple à copier :
+  {
+    nom: 'Nom', role: 'Rôle / lieu de rencontre', statut: 'NEUTRE', npc: true, affinite: 40,
+    citation: '« ... »', portrait: null, rencontre: 'Jour 01, Le Dédale', derniereMaj: 'Jour 02',
+    note: null,
+  },
+  */
+],
+relationsCases: 6,   // nombre de cases affichées (les vides sont grisées)
+
 /* TITRE */
 titres: [
   {

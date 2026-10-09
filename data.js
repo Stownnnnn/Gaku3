@@ -60,10 +60,11 @@ rolls: [
   { nom: 'Roll Magie',  val: 100 },
 ],
 
-/* COMPÉTENCES */
+/* COMPÉTENCES
+   groupe : 'Spéciale' ou 'Classique' (titres de groupe dans l'écran COMPÉTENCES) */
 competences: [
   {
-    nom: 'Lien Infortuné', type: 'Active', icone: 'lien',
+    nom: 'Lien Infortuné', groupe: 'Spéciale', type: 'Active', icone: 'lien',
     desc: "Crée un lien inséparable avec une cible et lui transfère la chance de l'utilisateur. Le malheur accumulé déclenche un événement catastrophique aléatoire. Le Système prévient l'utilisateur quelques secondes avant, mais l'utilisateur est toujours compté parmi les victimes. Les dégâts collatéraux peuvent provoquer des catastrophes plus grandes que prévu.",
     des: 100,   /* dé lancé au LV.5 (1 à des) — valeur à confirmer */
     niveaux: [
@@ -76,7 +77,7 @@ competences: [
     ],
   },
   {
-    nom: 'Accumulation du Chaos', type: 'Active', icone: 'chaos', niveau: 1,
+    nom: 'Accumulation du Chaos', groupe: 'Spéciale', type: 'Active', icone: 'chaos', niveau: 1,
     desc: "Le Chaos est une marque que Croc applique à ses adversaires. Chaque personne ou monstre marqué qu'il abattra lui fera absorber cette marque et renforcera ses statistiques de 0,5 %. La compétence évolue en absorbant des marques.",
     /* cout = % d'ENE · recharge = adversaires tués après une marque absorbée
        bonus = renfort par marque (en %) · marques = marques posées par rechargement */
@@ -91,7 +92,7 @@ competences: [
     ],
   },
   {
-    nom: 'Maîtrise des armes lourdes', type: 'Classique', icone: 'marteau', niveau: 1,
+    nom: 'Maîtrise des armes lourdes', groupe: 'Classique', type: 'Classique', icone: 'marteau', niveau: 1,
     desc: "Progresse à force d'utiliser des armes lourdes. La compétence n'a aucun effet.",
   },
 ],

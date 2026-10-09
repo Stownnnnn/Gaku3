@@ -474,7 +474,7 @@ const Title=(()=>{
    ÉTAT DE LA PARTIE + HUD + MENU
    ===================================================================== */
 const SAVE_KEY='croc-retro-sauvegarde';
-const G={chaos:0,cata:0,coups:0,elapsed:0,ene:100,lv:1,journal:[false,false,false,false],screen:null,booted:false,inGame:false,met:{}};
+const G={chaos:0,cata:0,coups:0,chLv:1,marques:0,abattus:0,renfort:0,chPret:true,elapsed:0,ene:100,lv:1,journal:[false,false,false,false],screen:null,booted:false,inGame:false,met:{}};
 (function restore(){const s=store.get(SAVE_KEY,null);if(s&&typeof s==='object'){G.chaos=+s.chaos||0;G.cata=+s.cata||0;G.coups=+s.coups||0;G.elapsed=+s.elapsed||0;if(Array.isArray(s.journal))G.journal=s.journal.slice(0,4).map(Boolean).concat([false,false,false,false]).slice(0,4)}})();
 const fmtTime=s=>`${pad(Math.floor(s/3600))}:${pad(Math.floor(s/60)%60)}:${pad(Math.floor(s%60))}`;
 function hud(){
@@ -767,7 +767,7 @@ function Battle(cv){
   for(const tx of[86,170]){R(tx-2,30,5,3,COL.gray);R(tx-1,33,3,4,COL.gray)}
   for(let y=0;y<H;y++)for(let i=0;i<W;i++){const d=Math.hypot((i-W/2)/(W/2),(y-H/2)/(H/2));if(bay(i,y)<(d-.85)*1.5)R(i,y,1,1,COL.ink)}
  })();
- const S={croc:{x:204,y:120,dx:0,dy:0,flash:0,hurt:0,swing:-1,cast:0},foe:{x:66,y:124,flash:0,hurt:0,dx:0},link:0,parts:[],pops:[],dark:0,tint:null,tintA:0,fx:null,flood:0,T:0};
+ const S={croc:{x:204,y:120,dx:0,dy:0,flash:0,hurt:0,swing:-1,cast:0},foe:{x:66,y:124,flash:0,hurt:0,dx:0,down:0,marks:0},link:0,parts:[],pops:[],dark:0,tint:null,tintA:0,fx:null,flood:0,T:0};
  let raf=0,last=0,alive=true;
  const hand=()=>[S.croc.x+S.croc.dx-11,S.croc.y-15],chest=()=>[S.foe.x+S.foe.dx+6,S.foe.y-30];
  function update(dt){
@@ -803,10 +803,19 @@ function Battle(cv){
   const f=S.foe,T=S.T;const sp=npcSprite('foe',0,FOE_PAL);const sway=Math.round(Math.sin(T*2.2));const ox=Math.round(f.x+f.dx-15+sway+(f.hurt>0?(Math.floor(T*30)%2?-2:2):0)),oy=Math.round(f.y-48+(f.hurt>0?2:0));
   x.fillStyle='rgba(11,10,16,.6)';x.fillRect(Math.round(f.x-15),f.y-1,30,4);
   const img=f.flash>0&&Math.floor(T*24)%2?tinted('foeW',sp,COL.white):sp;
+  if(f.down>0)x.globalAlpha=Math.max(0,1-f.down);
   const rim=tinted('foeR',sp,COL.vio3);x.drawImage(rim,ox-2,oy,30,48);x.drawImage(rim,ox+2,oy,30,48);x.drawImage(rim,ox,oy-2,30,48);x.drawImage(tinted('foeK',sp,COL.ink),ox+1,oy+2,30,48);
   x.drawImage(img,ox,oy,30,48);
   x.fillStyle=COL.blood2;if(Math.floor(T*3)%5){x.fillRect(ox+9,oy+12,3,3);x.fillRect(ox+18,oy+12,3,3)}
   drawText(x,'CIBLE',Math.round(f.x-textW('CIBLE')/2),oy-12,COL.gray2,1);
+  if(f.marks>0){const cx=Math.round(f.x),cy=oy-24+Math.round(Math.sin(T*3)*1.5),r=Math.floor(T*8)%4;
+   /* sceau du Chaos : losange rouge + croix, qui pulse */
+   x.fillStyle=COL.ink;x.fillRect(cx-6,cy-6,13,13);
+   for(let i=-5;i<=5;i++){const w=5-Math.abs(i);x.fillStyle=COL.blood2;x.fillRect(cx-w,cy+i,w*2+1,1)}
+   x.fillStyle=COL.bone;x.fillRect(cx,cy-3,1,7);x.fillRect(cx-3,cy,7,1);x.fillStyle=r%2?COL.white:COL.bone;x.fillRect(cx,cy,1,1);
+   x.fillStyle=COL.blood2;for(let k=0;k<4;k++){const a=T*2.4+k*1.571;x.fillRect(Math.round(cx+Math.cos(a)*9),Math.round(cy+Math.sin(a)*9),1,1)}
+   if(f.marks>1)drawTextOutlined(x,'x'+f.marks,cx+9,cy-4,COL.bone,1)}
+  x.globalAlpha=1;
  }
  function drawLink(){
   if(S.link<=0)return;const[ax,ay]=hand(),[bx,by]=chest();const d=Math.hypot(bx-ax,by-ay),n=Math.max(2,Math.floor(d/4)*S.link);const nx=-(by-ay)/d,ny=(bx-ax)/d;const T=S.T;
@@ -826,6 +835,7 @@ function Battle(cv){
    else if(p.t==='flame'){x.fillStyle=k>.7?COL.bone:k>.45?COL.blood2:k>.2?COL.blood:COL.blood0;const s=k>.5?2:1;x.fillRect(X,Y,s,s+1)}
    else if(p.t==='run'){const sp=tinted('runner'+p.pi,npcSprite(p.pi,0),COL.ink);const b=Math.floor(p.life*16)%2;x.drawImage(sp,X-10,Y-32-b,20,32);x.fillStyle=COL.blood2;x.fillRect(X-4,Y-24-b,2,2);x.fillRect(X+2,Y-24-b,2,2)}
    else if(p.t==='luck'){const u=Math.min(1,p.life/p.max);const[ax,ay]=hand(),[bx,by]=chest();const px=Math.round(ax+(bx-ax)*u),py=Math.round(ay+(by-ay)*u+Math.sin(u*9+p.ph)*4);x.fillStyle=p.col;x.fillRect(px-1,py,3,1);x.fillRect(px,py-1,1,3)}
+   else if(p.t==='absorb'){const u=Math.min(1,p.life/p.max),e=u*u;const[bx,by]=chest();const ax=S.croc.x+S.croc.dx-2,ay=S.croc.y-26;const px=Math.round(bx+(ax-bx)*e+Math.sin(u*7+p.ph)*10*(1-u)),py=Math.round(by+(ay-by)*e-Math.sin(u*3.14)*18);x.fillStyle=p.col;x.fillRect(px-1,py-1,2,2);if(u>.85){x.fillStyle=COL.white;x.fillRect(px,py,1,1)}}
    else if(p.t==='star'){x.fillStyle=COL.bone;const L=Math.round(8*k);for(let i=2;i<L;i++)x.fillRect(Math.round(p.x+Math.cos(p.a)*i*2),Math.round(p.y+Math.sin(p.a)*i*2),2,2)}
    else{x.fillStyle=p.col||COL.bone;x.fillRect(X,Y,2,2)}}
   if(S.dark>0){x.fillStyle=`rgba(11,10,16,${S.dark})`;x.fillRect(0,0,W,H)}
@@ -842,6 +852,10 @@ function Battle(cv){
   luck(n=14){for(let i=0;i<n;i++)setTimeout(()=>{if(!alive)return;S.parts.push({t:'luck',x:0,y:0,vx:0,vy:0,g:0,life:0,max:.8,ph:rnd(0,6),col:pick([COL.ice,COL.bone,COL.white])});SFX.luck()},i*90)},
   cata(kind){S.fx={kind,t:0,dur:1.8};if(kind==='boom'){}return sleep(1900)},
   hurt(who){const o=S[who];o.flash=.7;o.hurt=.7},
+  mark(n){S.foe.marks=n},
+  async fell(){S.foe.flash=.5;await tween(520,p=>S.foe.down=p)},
+  async respawn(){S.foe.marks=0;S.foe.dx=-40;await tween(420,p=>{S.foe.down=1-p;S.foe.dx=Math.round(-40*(1-p)/4)*4});S.foe.down=0;S.foe.dx=0},
+  absorb(n=12){for(let i=0;i<n;i++)setTimeout(()=>{if(!alive)return;S.parts.push({t:'absorb',x:0,y:0,vx:0,vy:0,g:0,life:0,max:.9,ph:rnd(0,6),col:pick([COL.blood2,COL.blood2,COL.bone,COL.vio3])});if(i%3===0)SFX.luck()},i*55);setTimeout(()=>{if(alive){S.croc.flash=.5}},n*55+700)},
   pop(t,who,col,sc=1){const o=S[who];S.pops.push({t,x:o.x+(o.dx||0),y:o.y-(who==='foe'?56:54),col,sc,life:0})},
   async hammer(){const c=S.croc;SFX.swing();await tween(220,p=>c.dx=-Math.round(p*104/4)*4);c.swing=0;
    let hitDone=false;await tween(260,p=>{c.swing=p;if(p>=.55&&!hitDone){hitDone=true;SFX.hammer(1.1);flash('#fff',.5,160);shake(cv.parentElement,12,420);S.foe.flash=.6;S.foe.hurt=.6;const[fx,fy]=chest();for(let i=0;i<12;i++)S.parts.push({t:'star',x:fx-4,y:fy+10,a:i/12*6.28,vx:0,vy:0,g:0,life:0,max:.35});S.pops.push({t:'BAM!',x:S.foe.x,y:S.foe.y-50,col:COL.bone,sc:2,life:0})}});
@@ -853,27 +867,46 @@ function Battle(cv){
 const kindOf=s=>{s=String(s).toLowerCase();if(/plafond|éboul|ebou|pont|effondr|chute|rompu/.test(s))return'chute';if(/canalis|eau|inond|fuite/.test(s))return'eau';if(/panne|court|électr|electr/.test(s))return'panne';if(/incend|feu|flamm|brûl/.test(s))return'feu';if(/stampede|ruée|ruee|monstre|horde/.test(s))return'ruee';return'boom'};
 
 SCREENS.competences={song:'combat',mount(p){
- const SK=D.competences||[];const L=SK.find(s=>s.icone==='lien')||SK[0];const M=SK.find(s=>s!==L);
+ const SK=D.competences||[];const L=SK.find(s=>s.icone==='lien')||SK[0];const C=SK.find(s=>s.icone==='chaos');const M=SK.find(s=>s.icone==='marteau')||SK.find(s=>s!==L&&s!==C);
+ const nivC=(C&&C.niveaux)||[];let lvC=clamp(G.chLv,1,Math.max(1,nivC.length));
+ const gOf=s=>{const g=String(s&&s.groupe||'').toLowerCase();return g.startsWith('sp')?'SPÉCIALES':g.startsWith('cl')?'CLASSIQUES':(g?g.toUpperCase():'AUTRES')};
+ const GRP=[];SK.forEach(s=>{const g=gOf(s);let e=GRP.find(x=>x.g===g);if(!e)GRP.push(e={g,l:[]});e.l.push(s)});
+ GRP.sort((a,b)=>(a.g==='SPÉCIALES'?0:a.g==='CLASSIQUES'?1:2)-(b.g==='SPÉCIALES'?0:b.g==='CLASSIQUES'?1:2));
+ const idOf=s=>s===L?'sk-lien':s===C?'sk-chaos':s===M?'sk-marteau':'';
+ const lvOf=s=>s===L?`LV.<span class="cl">${lv}</span>`:s===C?`LV.<span class="clc">${lvC}</span>`:(s.niveau?'LV.'+esc(s.niveau):'');
+ const ghead=(g)=>`<h3 class="grp-h"><span>COMPÉTENCES ${esc(g)}</span></h3>`;
  const niv=(L&&L.niveaux)||[];let lv=clamp(G.lv,1,Math.max(1,niv.length));let busy=false;
  p.innerHTML=head('COMPÉTENCES','[SYSTÈME] Simulation de combat')+`
+ <div class="box sk-ov" role="list" aria-label="Fiche des compétences">${GRP.map(e=>`<div class="ov-g"><span class="lbl">COMPÉTENCES ${esc(e.g)}</span>${e.l.map(s=>`<a role="listitem" href="#${idOf(s)}" class="ov-i" data-sk="${idOf(s)}"><span class="nm">[${esc(s.nom)}]</span><span class="tp${/act/i.test(s.type||'')?' act':''}">${esc(s.type||'')}</span><span class="lv">${lvOf(s)}</span></a>`).join('')}</div>`).join('')}</div>
  <div class="bt-wrap" id="btWrap"><div class="bt-msg win" id="btMsg" aria-live="polite"></div><canvas id="bt" aria-label="Scène de combat : ${esc(D.nom||'Croc')} face à une cible."></canvas><div class="bt-count" id="btCount" hidden></div></div>
  <div class="bt-ui">
   <div class="box cmds" id="cmds" role="group" aria-label="Commandes"><h3 class="cap">COMMANDES</h3>
+   ${(L&&gOf(L)==='SPÉCIALES')||(C&&gOf(C)==='SPÉCIALES')?'<span class="cmd-g">SPÉCIALES</span>':''}
    ${L?`<button type="button" class="cmd" data-c="lien">${esc((L.nom||'').toUpperCase())}<small>LV.<span class="cl">${lv}</span> · coût <span class="cc"></span> % ENE</small></button>
    <div class="lvsel" id="lvsel" role="group" aria-label="Niveau de ${esc(L.nom)}">${niv.map(n=>`<button type="button" data-lv="${n.lv}" aria-pressed="${n.lv===lv}">LV.${n.lv}</button>`).join('')}</div>`:''}
-   ${M?`<button type="button" class="cmd" data-c="marteau">MARTEAU<small>${esc(M.nom||'')}</small></button>`:''}
+   ${C?`<button type="button" class="cmd" data-c="chaos">${esc((C.nom||'').toUpperCase())}<small>LV.<span class="clc">${lvC}</span> · <span id="chState"></span></small></button>
+   <div class="lvsel" id="lvselC" role="group" aria-label="Niveau de ${esc(C.nom)}">${nivC.map(n=>`<button type="button" data-lv="${n.lv}" aria-pressed="${n.lv===lvC}">LV.${n.lv}</button>`).join('')}</div>`:''}
+   ${M?`<span class="cmd-g">${esc(gOf(M))}</span><button type="button" class="cmd" data-c="marteau">MARTEAU<small>[${esc(M.nom||'')}]${M.niveau?' · LV.'+esc(M.niveau):''}</small></button>`:''}
    <button type="button" class="cmd" data-c="repos">SE REPOSER<small>ENE → 100 %</small></button><span class="hand" aria-hidden="true"></span></div>
   <div class="box party"><h3 class="cap">${esc(D.nom||'CROC')}</h3>
    <div class="row ene" id="eneRow"><span class="lbl">ENE</span><span class="pbar"><i id="btEne"></i></span><b id="btEneV">${G.ene} %</b></div>
-   <p class="meta">CATASTROPHES SIMULÉES <b id="btCata">${G.cata}</b><br>COUPS DE MARTEAU <b id="btCoups">${G.coups}</b></p></div>
+   <p class="meta">CATASTROPHES SIMULÉES <b id="btCata">${G.cata}</b><br>COUPS DE MARTEAU <b id="btCoups">${G.coups}</b>${C?`<br>MARQUES ABSORBÉES <b id="btMarq">${G.marques}</b><br>RENFORT CUMULÉ <b id="btRenf">+${String(G.renfort).replace('.',',')} %</b>`:''}</p></div>
  </div>
- ${L?`<div class="box sang"><div class="sk-head"><span class="nm">[${esc(L.nom)}]</span><span class="tp act">${esc(L.type||'')}</span><span class="lv">LV.<span class="cl">${lv}</span></span></div>
+ ${(L&&gOf(L)==='SPÉCIALES')||(C&&gOf(C)==='SPÉCIALES')?ghead('SPÉCIALES'):''}
+ ${L?`<div class="box sang" id="sk-lien"><div class="sk-head"><span class="nm">[${esc(L.nom)}]</span><span class="tp act">${esc(L.type||'')}</span><span class="lv">LV.<span class="cl">${lv}</span></span></div>
   <p class="sk-desc">${esc(L.desc||'')}</p>
   <div class="lvtab"><div><span class="lbl">Coût</span><b id="lvC"></b></div><div><span class="lbl">Préavis du Système</span><b id="lvP"></b></div><div><span class="lbl">Dé du Système</span><b id="lvD"></b></div><div class="w"><span class="lbl">Pour atteindre ce niveau</span><b id="lvR"></b></div></div>
   <div class="lvspec" id="lvS" hidden></div></div>`:''}
- ${M?`<div class="box sk2"><div class="sk-head"><span class="nm">[${esc(M.nom)}]</span><span class="tp">${esc(M.type||'')}</span>${M.niveau?`<span class="lv">LV.${esc(M.niveau)}</span>`:''}</div><p class="sk-desc" style="margin:0">${esc(M.desc||'')}</p></div>`:''}
- <p class="sim-note">Simulation illustrative : les catastrophes affichées sont des exemples tirés de data.js. Le dé du LV.5 va de 1 à ${esc(L&&L.des||100)}.</p>`;
+ ${C?`<div class="box sang chbox" id="sk-chaos"><div class="sk-head"><span class="nm">[${esc(C.nom)}]</span><span class="tp act">${esc(C.type||'')}</span><span class="lv">LV.<span class="clc">${lvC}</span></span></div>
+  <p class="sk-desc">${esc(C.desc||'')}</p>
+  <div class="lvtab"><div><span class="lbl">Coût</span><b id="chC"></b></div><div><span class="lbl">Rechargement · après une marque absorbée</span><b id="chR"></b></div><div><span class="lbl">Renfort par marque</span><b id="chB"></b></div><div class="w"><span class="lbl">Pour atteindre ce niveau</span><b id="chQ"></b></div></div>
+  <div class="lvspec" id="chS" hidden></div>
+  <div class="chbar"><span class="lbl">RECHARGEMENT</span><span class="pbar"><i id="chBar"></i></span><b id="chTxt"></b></div></div>`:''}
+ ${M?ghead(gOf(M)):''}
+ ${M?`<div class="box sk2" id="sk-marteau"><div class="sk-head"><span class="nm">[${esc(M.nom)}]</span><span class="tp">${esc(M.type||'')}</span>${M.niveau?`<span class="lv">LV.${esc(M.niveau)}</span>`:''}</div><p class="sk-desc" style="margin:0">${esc(M.desc||'')}</p></div>`:''}
+ <p class="sim-note">Simulation illustrative : les catastrophes affichées sont des exemples tirés de data.js. Le dé du LV.5 va de 1 à ${esc(L&&L.des||100)}.${C?' Pour [Accumulation du Chaos], chaque coup de MARTEAU abat la cible : un nouvel adversaire apparaît.':''}</p>`;
  const bt=Battle($('#bt',p)),wrap=$('#btWrap',p),msgEl=$('#btMsg',p);
+ $$('.ov-i',p).forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const t=$('#'+a.dataset.sk,p);if(!t)return;SFX.ok();t.scrollIntoView({block:'start',behavior:RM?'auto':'smooth'});t.classList.remove('ping');void t.offsetWidth;t.classList.add('ping')}));
  let mtok=0;
  async function msg(t){const tok=++mtok;msgEl.textContent='';for(const[i,c]of[...t].entries()){if(tok!==mtok)return;msgEl.textContent+=c;if(c!==' '&&i%2===0)SFX.blip('sys');await sleep(RM?4:18)}await sleep(RM?100:500)}
  const setEne=v=>{G.ene=clamp(v,0,100);$('#btEne',p).style.width=G.ene+'%';$('#btEneV',p).textContent=G.ene+' %';$('#eneRow',p).classList.toggle('low',G.ene<30);hud()};
@@ -886,7 +919,7 @@ SCREENS.competences={song:'combat',mount(p){
  cm.addEventListener('focusin',e=>{if(e.target.matches('.cmd'))placeHand(hand,e.target)});
  cm.addEventListener('mouseover',e=>{const b=e.target.closest('.cmd');if(b&&hand.dataset.on!==b.dataset.c){hand.dataset.on=b.dataset.c;placeHand(hand,b);SFX.move()}});
  placeHand(hand,$('.cmd',cm));
- const lock=v=>{busy=v;$$('.cmd',cm).forEach(b=>b.disabled=v);$$('#lvsel button',p).forEach(b=>b.disabled=v)};
+ const lock=v=>{busy=v;$$('.cmd',cm).forEach(b=>b.disabled=v);$$('#lvsel button,#lvselC button',p).forEach(b=>b.disabled=v)};
  const alive=()=>document.contains(wrap);const mus=n=>{if(alive())AU.music(n)};
  async function lien(){
   const d=niv.find(z=>z.lv===lv)||{cout:0,preavis:5};
@@ -914,15 +947,47 @@ SCREENS.competences={song:'combat',mount(p){
   await msg(spared?`[SYSTÈME] Dé : ${roll} (< 20). Seule la cible est incluse dans la catastrophe.`:(roll!=null?`[SYSTÈME] Dé : ${roll}. L'utilisateur est compté parmi les victimes. Dégâts collatéraux possibles.`:"[SYSTÈME] L'utilisateur est compté parmi les victimes. Dégâts collatéraux possibles."));
   await bt.link(false);mus('combat');lock(false);
  }
+ const fr=v=>String(Math.round(v*10)/10).replace('.',',');
+ const dC=()=>nivC.find(z=>z.lv===lvC)||{cout:10,recharge:5,bonus:.5,marques:1};
+ function chSync(){if(!C)return;const d=dC();
+  $('#chC',p).textContent=(d.cout??'???')+' % ENE';$('#chR',p).textContent=d.recharge!=null?`${d.recharge} adversaires tués`:'???';$('#chR',p).title='Après une marque absorbée';
+  $('#chB',p).textContent=d.bonus!=null?`+${fr(d.bonus)} %`+((d.marques||1)>1?` (×${d.marques} marques)`:''):'???';$('#chQ',p).textContent=d.requis||'???';
+  const sp=$('#chS',p);sp.hidden=!d.special;sp.innerHTML=d.special?`<span class="lbl">Spécial LV.${lvC}</span>${esc(d.special)}`:'';
+  const N=d.recharge||1,k=G.chPret?N:Math.min(N,G.abattus);$('#chBar',p).style.width=(k/N*100)+'%';
+  $('#chTxt',p).textContent=bt.S.foe.marks?'MARQUE POSÉE':G.chPret?'PRÊTE':`${G.abattus} / ${N}`;
+  $('#chState',p).textContent=bt.S.foe.marks?'cible marquée':G.chPret?`coût ${d.cout} % ENE`:`recharge ${G.abattus}/${N}`;
+  $('.chbox',p).classList.toggle('ready',G.chPret&&!bt.S.foe.marks);
+  const m=$('#btMarq',p);if(m)m.textContent=G.marques;const r=$('#btRenf',p);if(r)r.textContent='+'+fr(G.renfort)+' %'}
+ const setLvC=n=>{lvC=n;G.chLv=n;$$('#lvselC button',p).forEach(b=>b.setAttribute('aria-pressed',+b.dataset.lv===n));$$('.clc',p).forEach(e=>e.textContent=n);chSync()};
+ if(C){setLvC(lvC);const ls=$('#lvselC',p);rove(ls,'button',{vertical:false});ls.addEventListener('click',e=>{const b=e.target.closest('button');if(b){setLvC(+b.dataset.lv);SFX.lvl(+b.dataset.lv)}})}
+ async function chaos(){
+  const d=dC();
+  if(bt.S.foe.marks){SFX.err();await msg('[SYSTÈME] La cible porte déjà la marque du Chaos. Abats-la pour l\'absorber.');return}
+  if(!G.chPret){SFX.err();await msg(`[SYSTÈME] [${C.nom}] en rechargement : ${G.abattus} / ${d.recharge} adversaires tués.`);return}
+  if(G.ene<d.cout){SFX.err();await msg(`[SYSTÈME] Énergie insuffisante : ${G.ene} % (coût ${d.cout} %). Repose-toi.`);return}
+  lock(true);SFX.ok();
+  await msg(`[SYSTÈME] ${D.nom||'Croc'} active [${C.nom}] LV.${lvC}.`);if(!alive())return;
+  SFX.chaos();setEne(G.ene-d.cout);bt.mark(d.marques||1);flash(COL.blood2,.35,240);shake(wrap,5,260);G.chPret=false;G.abattus=0;chSync();
+  await msg((d.marques||1)>1?`[SYSTÈME] ${d.marques} marques du Chaos posées. Abats les adversaires marqués pour les absorber.`:'[SYSTÈME] Marque du Chaos posée. Abats la cible pour l\'absorber.');
+  lock(false);
+ }
  async function marteau(){
   lock(true);await msg(`[SYSTÈME] ${D.nom||'Croc'} frappe : [${M.nom}].`);if(!alive())return;
   await bt.hammer();G.coups++;$('#btCoups',p).textContent=G.coups;
-  await msg('[SYSTÈME] '+(M.desc||''));lock(false);
+  if(!C){await msg('[SYSTÈME] '+(M.desc||''));lock(false);return}
+  const mk=bt.S.foe.marks;await bt.fell();if(!alive())return;bt.pop('ABATTU','foe',COL.gray2);
+  const d=dC();
+  if(mk){bt.absorb(10+mk*6);SFX.chaos();await sleep(RM?100:900);if(!alive())return;
+   G.marques+=mk;G.renfort=Math.round((G.renfort+mk*(d.bonus||0))*10)/10;G.abattus=0;bt.mark(0);SFX.good();bt.pop('+'+fr(mk*(d.bonus||0))+' %','croc',COL.blood2);chSync();
+   await msg(`[SYSTÈME] Marque${mk>1?'s':''} absorbée${mk>1?'s':''} (${mk}). Statistiques renforcées de ${fr(mk*(d.bonus||0))} %.${lvC>=3?' (F. Physique, F. Musculaire, Robustesse)':''} Rechargement : ${d.recharge} adversaires.`)}
+  else{if(!G.chPret){G.abattus++;if(G.abattus>=(d.recharge||1)){G.chPret=true;G.abattus=0;SFX.ene();chSync();await msg(`[SYSTÈME] [${C.nom}] rechargée.`)}else{chSync();await msg(`[SYSTÈME] Adversaire abattu. Rechargement : ${G.abattus} / ${d.recharge}.`)}}
+   else await msg('[SYSTÈME] Adversaire abattu.')}
+  if(!alive())return;await bt.respawn();lock(false);
  }
  async function repos(){
   lock(true);await msg(`[SYSTÈME] ${D.nom||'Croc'} se repose…`);SFX.rest();mus(null);await bt.rest();if(!alive())return;setEne(100);SFX.ene();mus('combat');await msg('[SYSTÈME] ENE rétablie : 100 %.');lock(false);
  }
- cm.addEventListener('click',e=>{const b=e.target.closest('.cmd');if(!b||busy)return;const c=b.dataset.c;const r=wrap.getBoundingClientRect();if(r.top<0||r.bottom>innerHeight)wrap.scrollIntoView({block:r.height<innerHeight-20?'center':'start',behavior:RM?'auto':'smooth'});(c==='lien'?lien:c==='marteau'?marteau:repos)().catch(err=>{console.error(err);lock(false)})});
+ cm.addEventListener('click',e=>{const b=e.target.closest('.cmd');if(!b||busy)return;const c=b.dataset.c;const r=wrap.getBoundingClientRect();if(r.top<0||r.bottom>innerHeight)wrap.scrollIntoView({block:r.height<innerHeight-20?'center':'start',behavior:RM?'auto':'smooth'});(c==='lien'?lien:c==='chaos'?chaos:c==='marteau'?marteau:repos)().catch(err=>{console.error(err);lock(false)})});
  msg(`[SYSTÈME] Une cible apparaît. Choisis une commande.`);
  return()=>{bt.destroy();mtok++};
 }};

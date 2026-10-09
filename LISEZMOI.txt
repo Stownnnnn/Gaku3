@@ -68,3 +68,10 @@ MODIFIER LE CONTENU (data.js)
   de 1 à 100 du niveau 5 viennent de data.js (« catastrophes » et « des ») : ajuste-les si besoin.
 - Illustrations : fan arts, droits réservés à leurs auteurs. Si tu connais les artistes,
   ajoute leurs noms dans la phrase du pied de page (index.html, classe « credit »).
+
+[ACCUMULATION DU CHAOS] (écran COMPÉTENCES)
+- Commande CHAOS : pose la marque sur la cible (2 marques au LV.5), coût en ENE.
+- MARTEAU abat la cible : si elle est marquée, la marque est absorbée (renfort affiché),
+  sinon l'adversaire compte pour le rechargement. Un nouvel adversaire apparaît ensuite.
+- Réglages par niveau dans data.js (competences > Accumulation du Chaos > niveaux) :
+  cout, recharge, bonus (renfort par marque en %), marques (posées par rechargement).

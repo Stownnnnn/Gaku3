@@ -31,7 +31,7 @@ champs: [
   { label: 'Croyance', valeur: 'Aucune' },
 ],
 physique: [
-  "Il soulève de la fonte dès qu'il ne tue pas de monstres : son corps est bâti « comme une machine ».",
+  "Il soulève de la fonte dès qu'il ne tue pas de monstres et à force son corps est bâti « comme une machine ».",
   "Il est couvert de cicatrices de toutes tailles, laissées par des monstres comme par des êtres doués de raison.",
   "Muet.",
 ],
@@ -41,7 +41,7 @@ psycho: [
   "Difficile à cerner, distant, froid. Aucune émotion ne passe sur son visage : il semble absorbé dans son propre monde.",
   "Il considère la plupart des gens comme des NPC, une habitude venue des jeux vidéo, auxquels il joue depuis tout petit.",
   "Son frère, Eilyn, est la seule exception, à cause des circonstances inhabituelles de leur naissance.",
-  "Il s'en est déjà pris à des gens qu'il jugeait « mauvais NPC » et a causé du Chaos. La frontière entre bon et mauvais NPC est très mince pour lui : prudence en l'abordant.",
+  "Il s'en est déjà pris à des gens qu'il jugeait comme des « mauvais NPC », cela a souvent mené à des bagarres de rues. La frontière entre bon et mauvais NPC est très mince pour lui : prudence en l'abordant.",
 ],
 
 /* STATISTIQUES (max 20 = barre à niveaux) */
@@ -77,7 +77,7 @@ competences: [
   },
   {
     nom: 'Maîtrise des armes lourdes', type: 'Classique', icone: 'marteau', niveau: 1,
-    desc: "Progresse à force d'utiliser des armes lourde. La compétence n'a aucun effet.",
+    desc: "Progresse à force d'utiliser des armes lourdes. La compétence n'a aucun effet.",
   },
 ],
 /* Événements de la simulation (exemples libres, remplace-les à ta guise) */

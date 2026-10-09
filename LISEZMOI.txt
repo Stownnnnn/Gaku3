@@ -63,8 +63,8 @@ MODIFIER LE CONTENU (data.js)
   et l'album affiche le rendu PIXEL à la place (c'est normal).
 - SAUVEGARDER : la partie (chaos, catastrophes, temps…) est gardée dans TON navigateur
   uniquement ; « Exporter une capture » télécharge une image PNG de la sauvegarde.
-- Rien n'a été inventé sur Croc : nom et prénom restent « ??? ». L'apparence d'Eilyn n'étant pas
-  décrite, il apparaît comme une silhouette lumineuse. Les catastrophes de la simulation et le dé
+- Rien n'a été inventé sur Croc : nom et prénom restent « ??? ». Eilyn a son propre sprite
+  (d'après l'illustration de référence) et son portrait dans images/eilyn-portrait.jpg. Les catastrophes de la simulation et le dé
   de 1 à 100 du niveau 5 viennent de data.js (« catastrophes » et « des ») : ajuste-les si besoin.
 - Illustrations : fan arts, droits réservés à leurs auteurs. Si tu connais les artistes,
   ajoute leurs noms dans la phrase du pied de page (index.html, classe « credit »).

@@ -90,6 +90,12 @@ const NPC_PALS=[
  {1:'#2a2a3a',2:'#8a3a3a',3:'#5a2020',4:'#16131f'},{1:'#c9a86a',2:'#3a5a6a',3:'#24404c',4:'#2a2140'}
 ];
 const EILYN_PAL={1:'#fbf6ea',2:'#e8e0cc',3:'#c9c0aa',4:'#c9c0aa',s:'#fbf6ea',S:'#e8e0cc',o:'#45365e'};
+/* Eilyn — 16×24 comme Croc : cheveux argentés en bataille, yeux bleus, col roulé blanc côtelé,
+   long manteau beige ouvert, livre noir à la main (d'après l'illustration de référence). */
+const EIL_TOP=["....h..hhh..h...", "...hhhhhhhhhh...", "..hhhhhgghhhhh..", ".hhhHhhgghhhHhh.", "..hhHhhhhghhhHh.", ".hHhHhhshHhhhHh.", "..hHhssHhhsshHh.", "..hHseshHhsesHh.", "..oHssshhsssSH..", "...oSsssssssSo..", "....oSssmssSo...", ".....oSSSSSo....", "...ccttttttttc..", "..cCctTtTtTtcCc.", ".cCcwwwwwTtTtcC.", ".cCkKkkkkwtTtcC.", ".cCkKkkkkwtTtcC.", ".cCkkkkkkwtTtcC.", ".cCcsskkktTtTcC.", ".cCcCsscTtTtTcC."];
+const EIL_LEGS=[[".cCc.pppppp.cCc.", "..Cc.pp..pp.cC..", "....ppp..ppp....", "....fff..fff...."], [".cCc.pppppp.cCc.", "..Cc.pp...pp.C..", "...ppp....ppp...", "...fff.....ff..."]];
+const EIL_SPAL={o:'#2a2533',h:'#eef3f4',H:'#a7b6be',g:'#cdd8dd',s:'#efd7c8',S:'#c9a493',m:'#b98a7c',e:'#3d5fe0',t:'#eef1f7',T:'#aab5d2',c:'#ddd3c0',C:'#a99e8a',w:'#f6f3ea',k:'#1e2030',K:'#3c4260',p:'#3b3a48',f:'#2a2733',F:'#55526a'};
+const eilynSprite=f=>sprite('eilyn16-'+(f?1:0),EIL_TOP.concat(EIL_LEGS[f?1:0]),EIL_SPAL);
 const FOE_PAL={1:'#2a2140',2:'#3a3050',3:'#2a2140',4:'#1d1830',s:'#6a5590',S:'#45365e',o:'#0b0a10'};
 const npcSprite=(pi,f,pal)=>sprite('npc'+pi+'-'+f,f?NPC_ROWS2:NPC_ROWS,pal||NPC_PALS[pi%NPC_PALS.length]);
 
@@ -348,6 +354,7 @@ function drawFace(cv,who){
  if(who==='croc'){
   if(FACE.croc)x.drawImage(FACE.croc,0,0);
   else{x.drawImage(crocSprite('down',0),0,0,16,12,0,4,32,24)}
+ }else if(who==='rel'&&FACE.rel){x.drawImage(FACE.rel,0,0,32,32);
  }else if(who==='pnj'){
   x.fillStyle=COL.night;x.fillRect(0,0,32,32);x.drawImage(npcSprite(FACE.pnjPal||0,0),0,0,10,10,1,4,30,30);
  }else{
@@ -378,7 +385,7 @@ const DLG=(()=>{
    if(finish){el.textContent=txt;break}
    el.textContent+=chars[i];const c=chars[i];
    if(who==='croc'){SFX.blip('croc');await sleep(RM?60:300)}
-   else{if(c!==' '&&i%2===0)SFX.blip(who);await sleep(/[.!?…]/.test(c)?110:/[,;:]/.test(c)?70:RM?8:24)}
+   else{if(c!==' '&&i%2===0)SFX.blip(who==='rel'?'pnj':who);await sleep(/[.!?…]/.test(c)?110:/[,;:]/.test(c)?70:RM?8:24)}
   }
   typing=false;nx.classList.add('on');
   if(skipAll)return;
@@ -617,7 +624,7 @@ function Overworld(cv,hooks){
  cv.addEventListener('keyup',e=>{if(KM[e.key])keys.delete(KM[e.key])});
  cv.addEventListener('blur',()=>keys.clear());
  const toLocal=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width*VW+cam,(e.clientY-r.top)/r.height*H]};
- const hit=(px,py)=>npcs.find(n=>n.alive&&px>n.x-7&&px<n.x+7&&py>n.y-19&&py<n.y+2);
+ const hit=(px,py)=>npcs.find(n=>n.alive&&px>n.x-(n.eilyn?9:7)&&px<n.x+(n.eilyn?9:7)&&py>n.y-(n.eilyn?27:19)&&py<n.y+2);
  cv.addEventListener('pointerdown',e=>{if(busy)return;const[px,py]=toLocal(e);const n=hit(px,py);cv.focus({preventScroll:true});croc.target=n?{npc:n}:{x:clamp(px,20,236),y:clamp(py,48,142)};SFX.move()});
  cv.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;const[px,py]=toLocal(e);const h=hit(px,py)||null;if(h!==hover){hover=h;if(h)SFX.move()}});
  cv.addEventListener('pointerleave',()=>hover=null);
@@ -638,7 +645,7 @@ function Overworld(cv,hooks){
    if(p<1)requestAnimationFrame(f);else{croc.swing=-1;res()}})();
  })}
  function bless(n){n.judged='bon';SFX.good();burst(n.x,n.y-18,'spark',10,[COL.ice,COL.white,COL.ice2])}
- function hearts(n){burst(n.x,n.y-18,'heart',9,[COL.blood2,COL.bone])}
+ function hearts(n){burst(n.x,n.y-(n.eilyn?26:18),'heart',9,[COL.blood2,COL.bone])}
  /* ---- boucle ---- */
  function step(e,vx,vy,dt,sp){const nx=e.x+vx*sp*dt,ny=e.y+vy*sp*dt;let m=false;if(vx&&free(nx,e.y,5,e)){e.x=nx;m=true}if(vy&&free(e.x,ny,5,e)){e.y=ny;m=true}return m}
  function update(dt){
@@ -670,10 +677,10 @@ function Overworld(cv,hooks){
    if(p<.6){x.fillStyle='rgba(232,224,204,.5)';for(let k=1;k<4;k++){const q=Math.max(0,e-k*.12),ph=Math.PI*.8-(Math.PI*.8+.35)*q;const gx=fx?hx+fx*R*Math.cos(ph):hx+2,gy=fx?hy-R*Math.sin(ph):hy-R*Math.sin(ph);x.fillRect(Math.round(gx-2),Math.round(gy-2),4,4)}}}
  }
  function drawNpc(n){
-  const sp=n.eilyn?sprite('eilyn'+n.f,n.f?NPC_ROWS2:NPC_ROWS,EILYN_PAL):npcSprite(n.pi,n.f);const img=n.dir===-1?flipped((n.eilyn?'eilyn':'npc'+n.pi)+'-'+n.f,sp):sp;
-  const ox=Math.round(n.x-5),oy=Math.round(n.y-16);
+  const sp=n.eilyn?eilynSprite(n.f):npcSprite(n.pi,n.f);const img=n.dir===-1?flipped((n.eilyn?'eilyn16':'npc'+n.pi)+'-'+n.f,sp):sp;
+  const ox=Math.round(n.x-(n.eilyn?8:5)),oy=Math.round(n.y-(n.eilyn?24:16));
   if(n.spawnT<1&&Math.floor(T*20)%2)return;
-  if(n.eilyn){x.globalAlpha=.35+.15*Math.sin(T*3);x.drawImage(tinted('eil',sp,COL.ice),ox-1,oy);x.drawImage(tinted('eil',sp,COL.ice),ox+1,oy);x.drawImage(tinted('eil',sp,COL.ice),ox,oy-1);x.globalAlpha=1}
+  if(n.eilyn){const g=tinted('eil16-'+n.f,img,COL.ice);x.globalAlpha=.3+.12*Math.sin(T*3);x.drawImage(g,ox-1,oy);x.drawImage(g,ox+1,oy);x.drawImage(g,ox,oy-1);x.globalAlpha=1}
   x.drawImage(img,ox,oy);
   if(n.judged==='bon'){const b=Math.floor(T*3)%2;drawText(x,'♪',n.x-2,n.y-26-b,COL.ice,1)}
  }
@@ -696,10 +703,10 @@ function Overworld(cv,hooks){
   x.restore();x.drawImage(vig,0,0);x.save();x.translate(-Math.round(cam),0);
   /* étiquettes */
   const show=new Set([hover,near].filter(Boolean));
-  for(const n of show){if(!n.alive)continue;const top=n.y-18-(n.judged?6:0);
+  for(const n of show){if(!n.alive)continue;const top=n.y-(n.eilyn?26:18)-(n.judged?6:0);
    if(n.eilyn)drawLabel(x,n.name+' ♥',n.x,top-1,COL.bone,COL.blood0,COL.bone);
    else drawLabel(x,n.judged==='bon'?'BON NPC':'NPC',n.x,top-1,n.judged?COL.ice:COL.bone,COL.ink,n.judged?COL.ice2:COL.gray)}
-  if(!show.has(eil)&&eil.alive){const b=Math.floor(T*2)%2;drawText(x,'♥',eil.x-2,eil.y-26-b,COL.blood2,1)}
+  if(!show.has(eil)&&eil.alive){const b=Math.floor(T*2)%2;drawText(x,'♥',eil.x-2,eil.y-34-b,COL.blood2,1)}
   if(near&&!busy){const b=Math.floor(T*4)%2;x.fillStyle=COL.bone;x.fillRect(Math.round(croc.x)-1,Math.round(croc.y)-33-b,3,1);x.fillRect(Math.round(croc.x),Math.round(croc.y)-32-b,1,1)}
   x.restore();
  }
@@ -1005,11 +1012,12 @@ function relPortrait(cv,r,size){
  const x=cv.getContext('2d');cv.width=size;cv.height=size;x.imageSmoothingEnabled=false;
  x.fillStyle=COL.night;x.fillRect(0,0,size,size);for(let y=0;y<size;y+=2)for(let i=(y/2)%2;i<size;i+=2)if(bay(i,y)<.25){x.fillStyle=COL.deep;x.fillRect(i,y,1,1)}
  const isFr=r.npc===false;
- const drawSp=()=>{const sp=isFr?sprite('eilyn0',NPC_ROWS,EILYN_PAL):npcSprite(relHash(r.nom)%NPC_PALS.length,0);const k=Math.max(1,Math.floor(size*.8/sp.height));const w=sp.width*k,h=sp.height*k,ox=Math.round((size-w)/2),oy=size-h;
-  if(isFr){x.globalAlpha=.45;for(const[dx,dy]of[[-1,0],[1,0],[0,-1]])x.drawImage(tinted('eil',sp,COL.ice),ox+dx*k,oy+dy*k,w,h);x.globalAlpha=1}
+ const drawSp=()=>{const sp=isFr?eilynSprite(0):npcSprite(relHash(r.nom)%NPC_PALS.length,0);const k=Math.max(1,Math.floor(size*.8/sp.height));const w=sp.width*k,h=sp.height*k,ox=Math.round((size-w)/2),oy=size-h;
+  if(isFr){x.globalAlpha=.45;for(const[dx,dy]of[[-1,0],[1,0],[0,-1]])x.drawImage(tinted('eil16-0',sp,COL.ice),ox+dx*k,oy+dy*k,w,h);x.globalAlpha=1}
   x.drawImage(sp,ox,oy,w,h)};
- if(r.portrait){loadImg(r.portrait).then(im=>{const s=Math.min(im.naturalWidth,im.naturalHeight);const c=pixelArt(im,size,{crop:[(im.naturalWidth-s)/2,0,s,s],h:size,dither:true});x.drawImage(c,0,0)}).catch(drawSp)}else drawSp();
+ if(r.portrait){loadImg(r.portrait).then(im=>{const W=im.naturalWidth,H=im.naturalHeight;let q=Math.min(W,H);if(size<=40)q*=.76;const cx=(W-q)/2,cy=size<=40?Math.min(H-q,H*.1):0;const c=pixelArt(im,size,{crop:[cx,cy,q,q],h:size,dither:true});x.drawImage(c,0,0)}).catch(drawSp)}else drawSp();
 }
+function relFace(r){const c=document.createElement('canvas');relPortrait(c,r,32);FACE.rel=c}
 function relHearts(a){if(a==null||a==='')return`<span class="rl-noaff">NON ÉVALUÉE</span>`;const v=Math.max(0,Math.min(100,+a||0));let o='';for(let i=0;i<10;i++){const f=v-i*10;o+=`<i style="background-image:url('${f>=10?HEART_URI.full:f>=5?HEART_URI.half:HEART_URI.empty}')"></i>`}return`<span class="rl-hearts" aria-label="Affinité ${v} sur 100">${o}</span><b class="rl-affv">${v}</b>`}
 SCREENS.relations={song:'menu',mount(p){
  const R=Array.isArray(D.relations)?D.relations:[];const cases=Math.max(R.length,+D.relationsCases||6);
@@ -1040,9 +1048,9 @@ SCREENS.relations={song:'menu',mount(p){
    <div class="rl-rows">${row('RENCONTRE',r.rencontre)}${row('DERNIÈRE INTERACTION',r.derniereMaj)}</div>
    ${r.note?`<div class="rl-note"><span class="lbl">NOTE DU SYSTÈME</span>${esc(r.note)}</div>`:''}
    <div class="rl-act"><button type="button" class="pbtn" id="rlTalk">▶ PARLER</button></div>`;
-  relPortrait($('.rl-big',det),r,64);
+  relPortrait($('.rl-big',det),r,80);
   $('#rlTalk',det).onclick=()=>{SFX.ok();const nm=String(r.nom||'???').toUpperCase();
-   const L=r.citation?[{who:'pnj',name:nm,t:r.citation,pal:relHash(r.nom)%NPC_PALS.length},{who:'croc'}]:[{who:'sys',t:`[SYSTÈME] Aucune réplique enregistrée pour ${r.nom||'ce contact'}.`},{who:'croc'}];
+   relFace(r);const L=r.citation?[{who:'rel',name:nm,t:r.citation},{who:'croc'}]:[{who:'sys',t:`[SYSTÈME] Aucune réplique enregistrée pour ${r.nom||'ce contact'}.`},{who:'croc'}];
    DLG.say(L)};
  }
  function selRel(i,sound=true){if(i<0){SFX.err();return}sel=i;$$('.rl-card',list).forEach(b=>b.setAttribute('aria-pressed',+b.dataset.i===i));drawDet();if(sound){R[i]&&R[i].npc===false?SFX.heart():SFX.ok()}

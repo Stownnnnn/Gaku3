@@ -112,7 +112,7 @@ catastrophes: [
 relations: [
   {
     nom: 'Eilyn', role: 'Frère', statut: null, npc: false, affinite: null,
-    citation: null, portrait: null, rencontre: null, derniereMaj: null,
+    citation: null, portrait: 'images/eilyn-portrait.jpg', rencontre: null, derniereMaj: null,
     note: "Le seul que Croc ne voit pas comme un NPC, à cause des circonstances inhabituelles de leur naissance.",
   },
   /* Exemple à copier :

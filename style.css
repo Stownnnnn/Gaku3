@@ -337,6 +337,7 @@ h3.cap small{color:var(--gray2);font-size:11px}
 .dlg-box.sys{border-image-source:var(--fr-glace)}
 .dlg-box.croc{border-image-source:var(--fr-os)}
 .dlg-box.pnj{border-image-source:var(--fr-dim)}
+.dlg-box.rel{border-image-source:var(--fr-glace)}
 .dlg-name{position:absolute;top:-8px;left:18px;transform:translateY(-60%);font-family:var(--f-ui);font-size:13px;letter-spacing:.12em;padding:2px 10px;background:var(--ice);color:var(--ink);box-shadow:0 0 0 2px var(--ink)}
 .dlg-box.croc .dlg-name{background:var(--bone)}
 .dlg-box.pnj .dlg-name{background:var(--gray2)}

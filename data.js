@@ -33,7 +33,7 @@ champs: [
 physique: [
   "Il soulève de la fonte dès qu'il ne tue pas de monstres : son corps est bâti « comme une machine ».",
   "Il est couvert de cicatrices de toutes tailles, laissées par des monstres comme par des êtres doués de raison.",
-  "Muet et handicapé de naissance.",
+  "Muet.",
 ],
 
 /* PSYCHOLOGIE */
@@ -64,7 +64,7 @@ rolls: [
 competences: [
   {
     nom: 'Lien Infortuné', type: 'Active', icone: 'lien',
-    desc: "Crée un lien inséparable avec une cible et lui transfère la chance de l'utilisateur. Le malheur accumulé déclenche un événement catastrophique aléatoire. Le Système prévient quelques secondes avant, mais l'utilisateur est toujours compté parmi les victimes. Les dégâts collatéraux peuvent provoquer des catastrophes plus grandes que prévu.",
+    desc: "Crée un lien inséparable avec une cible et lui transfère la chance de l'utilisateur. Le malheur accumulé déclenche un événement catastrophique aléatoire. Le Système prévient l'utilisateur quelques secondes avant, mais l'utilisateur est toujours compté parmi les victimes. Les dégâts collatéraux peuvent provoquer des catastrophes plus grandes que prévu.",
     des: 100,   /* dé lancé au LV.5 (1 à des) — valeur à confirmer */
     niveaux: [
       { lv: 1, cout: 40, preavis: 5,  requis: 'Niveau de départ.' },
@@ -77,7 +77,7 @@ competences: [
   },
   {
     nom: 'Maîtrise des armes lourdes', type: 'Classique', icone: 'marteau', niveau: 1,
-    desc: "Progresse à force d'utiliser des armes lourdes. Il est de mieux en mieux.",
+    desc: "Progresse à force d'utiliser des armes lourde. La compétence n'a aucun effet.",
   },
 ],
 /* Événements de la simulation (exemples libres, remplace-les à ta guise) */

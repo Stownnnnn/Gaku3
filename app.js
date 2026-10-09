@@ -944,7 +944,7 @@ SCREENS.competences={song:'combat',mount(p){
   await sleep(350);
   if(spared){bt.pop('ÉPARGNÉ','croc',COL.ice)}else{bt.hurt('croc');bt.pop('VICTIME','croc',COL.blood2);SFX.hit()}
   G.cata++;$('#btCata',p).textContent=G.cata;hud();
-  await msg(spared?`[SYSTÈME] Dé : ${roll} (< 20). Seule la cible est incluse dans la catastrophe.`:(roll!=null?`[SYSTÈME] Dé : ${roll}. L'utilisateur est compté parmi les victimes. Dégâts collatéraux possibles.`:"[SYSTÈME] L'utilisateur est compté parmi les victimes. Dégâts collatéraux possibles."));
+  await msg(spared?`[SYSTÈME] Dé : ${roll} (< 20). Seule la cible est incluse dans la catastrophe.`:(roll!=null?`[SYSTÈME] Dé : ${roll}. L'utilisateur est compté parmi les victimes.`:"[SYSTÈME] L'utilisateur est compté parmi les victimes."));
   await bt.link(false);mus('combat');lock(false);
  }
  const fr=v=>String(Math.round(v*10)/10).replace('.',',');

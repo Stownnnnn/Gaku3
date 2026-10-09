@@ -76,6 +76,21 @@ competences: [
     ],
   },
   {
+    nom: 'Accumulation du Chaos', type: 'Active', icone: 'chaos', niveau: 1,
+    desc: "Le Chaos est une marque que Croc applique à ses adversaires. Chaque personne ou monstre marqué qu'il abattra lui fera absorber cette marque et renforcera ses statistiques de 0,5 %. La compétence évolue en absorbant des marques.",
+    /* cout = % d'ENE · recharge = adversaires tués après une marque absorbée
+       bonus = renfort par marque (en %) · marques = marques posées par rechargement */
+    niveaux: [
+      { lv: 1, cout: 10, recharge: 5,  bonus: 0.5, marques: 1, requis: 'Niveau de départ.' },
+      { lv: 2, cout: 10, recharge: 10, bonus: 0.5, marques: 1, requis: '5 marques absorbées depuis le niveau précédent.' },
+      { lv: 3, cout: 10, recharge: 15, bonus: 1,   marques: 1, requis: '5 marques absorbées depuis le niveau précédent.',
+        special: "Les marques renforcent les statistiques de Force Physique, de Force Musculaire et de Robustesse de Croc désormais de 1 % par 1 %." },
+      { lv: 4, cout: 10, recharge: 25, bonus: 1,   marques: 1, requis: '10 marques absorbées depuis le niveau précédent.' },
+      { lv: 5, cout: 10, recharge: 35, bonus: 1,   marques: 2, requis: '10 marques absorbées depuis le niveau précédent.',
+        special: "Croc peut désormais poser ses marques sur deux adversaires simultanément à chaque rechargement." },
+    ],
+  },
+  {
     nom: 'Maîtrise des armes lourdes', type: 'Classique', icone: 'marteau', niveau: 1,
     desc: "Progresse à force d'utiliser des armes lourdes. La compétence n'a aucun effet.",
   },

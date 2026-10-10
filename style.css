@@ -511,3 +511,81 @@ body.crt #crt::after{content:"";position:absolute;inset:0;background:linear-grad
 }
 @media (max-width:420px){.rl-top{grid-template-columns:72px minmax(0,1fr)}.rl-big{width:72px;height:72px}.rl-nm{font-size:18px}}
 @media (prefers-reduced-motion:reduce){.rl-card[aria-pressed="true"]::before{animation:none}}
+
+/* =====================================================================
+   BALADE — mini-jeu en vue de côté (balade.js)
+   ===================================================================== */
+html.balade-lock,html.balade-lock body{overflow:hidden;overscroll-behavior:none}
+body.balade-on #crt{display:none}
+.bl-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start;margin-bottom:16px}
+.bl-tape{position:relative;padding:10px;background:linear-gradient(180deg,#1a1426,#0d0a14);box-shadow:0 0 0 2px var(--ink),0 0 0 4px var(--vio2),0 0 0 6px var(--ink),0 8px 0 4px rgba(0,0,0,.45)}
+.bl-prev{width:100%;aspect-ratio:16/9;background:var(--ink);box-shadow:0 0 0 2px #000}
+.bl-rec{position:absolute;right:18px;top:16px;font-family:var(--f-ui);font-size:11px;color:var(--blood2);text-shadow:1px 1px 0 var(--ink);animation:blink 1.2s steps(1) infinite}
+.bl-side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.bl-start{display:flex;flex-direction:column;align-items:stretch;gap:4px}
+.bl-start .pbtn{justify-content:center;font-size:15px;padding:12px 14px}
+.bl-start .bl-new{font-size:12px;padding:8px 10px}
+.bl-note{font-family:var(--f-ui);font-size:10px;color:var(--gray2);line-height:1.6;margin:6px 4px 0}
+.bl-note kbd,.bl-k kbd,.bld-help kbd{font-family:inherit;color:var(--bone);background:var(--vio);padding:0 4px;box-shadow:0 2px 0 var(--ink);white-space:nowrap}
+.bl-dl{margin:0;display:grid;gap:4px;font-family:var(--f-ui);font-size:12px}
+.bl-dl div{display:flex;justify-content:space-between;gap:8px;border-bottom:2px dotted var(--vio2);padding-bottom:2px}
+.bl-dl dt{color:var(--gray2)}.bl-dl dd{margin:0;color:var(--bone);text-align:right}
+.bl-k{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.bl-k li{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px;align-items:baseline}
+.bl-k b{font-weight:400;font-size:15px;color:var(--bone2);line-height:1.6}
+@media (max-width:820px){.bl-grid{grid-template-columns:1fr}.bl-k li{grid-template-columns:1fr;gap:0}}
+
+.bld{position:fixed;inset:0;z-index:45;display:flex;flex-direction:column;align-items:center;background:#05040a;
+  background-image:radial-gradient(ellipse at 50% 40%,rgba(69,30,94,.35),transparent 70%);color:var(--bone);touch-action:none;-webkit-user-select:none;user-select:none}
+.bld-top{display:flex;align-items:center;gap:6px;width:100%;max-width:1200px;padding:max(6px,env(safe-area-inset-top)) 10px 6px;flex-wrap:nowrap}
+.bld-t{flex:1;text-align:center;font-family:var(--f-ui);font-size:12px;letter-spacing:.2em;color:var(--gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bld-b{font-family:var(--f-ui);font-size:12px;letter-spacing:.04em;padding:6px 9px;background:var(--night);color:var(--gray2);box-shadow:0 0 0 2px var(--ink),0 0 0 4px var(--vio2);margin:3px;white-space:nowrap}
+.bld-b small{font-size:9px;color:var(--gray);margin-left:4px}
+.bld-b b{font-weight:400;color:var(--ice)}
+.bld-b:hover,.bld-b:focus-visible{color:var(--bone);box-shadow:0 0 0 2px var(--ink),0 0 0 4px var(--bone);outline:none}
+.bld-stage{position:relative;flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
+.bld-cv{display:block;image-rendering:pixelated;background:#000;box-shadow:0 0 0 2px #000,0 0 0 4px #1d1830,0 0 40px rgba(255,63,164,.12);outline:none;cursor:crosshair}
+.bld-cv:focus-visible{box-shadow:0 0 0 2px #000,0 0 0 4px var(--ice)}
+.bld-help{margin:6px 0 10px;padding:0 12px;font-family:var(--f-ui);font-size:10px;line-height:1.9;color:var(--gray);text-align:center;max-width:1200px}
+.bld-end{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,calc(100% - 24px));padding:16px 16px 10px;z-index:2;text-align:center}
+.bld-end-t{font-family:var(--f-ui);font-size:20px;letter-spacing:.14em;color:var(--bone);text-shadow:2px 0 0 rgba(255,40,90,.7),-2px 0 0 rgba(60,230,255,.6);margin:0 0 10px}
+.bld-end-l{margin:0 0 10px;display:grid;gap:4px;font-family:var(--f-ui);font-size:13px;text-align:left}
+.bld-end-l div{display:flex;justify-content:space-between;border-bottom:2px dotted var(--vio2);padding-bottom:2px}
+.bld-end-l dt{color:var(--gray2)}.bld-end-l dd{margin:0}
+.bld-end-l .eil dd,.bld-end-l .eil dt{color:var(--blood2)}
+.bld-end-b{display:flex;flex-wrap:wrap;justify-content:center}
+.bld-end-b .pbtn{font-size:12px;padding:8px 10px}
+/* commandes tactiles */
+.bld-pad{width:100%;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;padding:10px 14px max(14px,env(safe-area-inset-bottom));touch-action:none}
+.bld-dpad{position:relative;width:150px;height:150px;flex:none;border-radius:50%;background:radial-gradient(circle,rgba(42,33,64,.9) 0 40%,rgba(29,24,48,.85) 41% 100%);box-shadow:0 0 0 2px var(--ink),0 0 0 4px var(--vio2);touch-action:none}
+.bld-dpad span{position:absolute;width:46px;height:46px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--gray2);background:var(--night);box-shadow:0 0 0 2px var(--ink),0 0 0 3px var(--vio2);pointer-events:none}
+.bld-dpad [data-d="jump"]{left:52px;top:4px}.bld-dpad [data-d="d"]{left:52px;bottom:4px}.bld-dpad [data-d="l"]{left:4px;top:52px}.bld-dpad [data-d="r"]{right:4px;top:52px}
+.bld-dpad span.on{background:var(--ice);color:var(--ink)}
+.bld-btns{display:grid;grid-template-columns:repeat(2,minmax(0,78px));grid-template-areas:"t s" "o s2" "a j";gap:10px;touch-action:none}
+.bld-btns button{min-height:50px;font-family:var(--f-ui);font-size:11px;letter-spacing:.04em;color:var(--bone);background:var(--vio);box-shadow:inset 0 -3px 0 var(--night),0 0 0 2px var(--ink),0 0 0 4px var(--gray);border-radius:10px;touch-action:none}
+.bld-btns .k-t{grid-area:t;background:#123a44}.bld-btns .k-s{grid-area:s;background:#4a1a3a}.bld-btns .k-o{grid-area:o}
+.bld-btns .k-a{grid-area:a;background:var(--blood0);min-height:64px}.bld-btns .k-j{grid-area:j;min-height:64px;background:#1f4f5c}
+.bld-btns button.on{transform:translateY(2px);filter:brightness(1.6)}
+.bld.touch .bld-help{display:none}
+.bld.touch .bld-cv{cursor:default}
+.bld.touch:not(.port) .bld-pad{position:absolute;left:0;right:0;bottom:0;pointer-events:none;padding:8px 10px max(8px,env(safe-area-inset-bottom))}
+.bld.touch:not(.port) .bld-pad>*{pointer-events:auto;opacity:.78}
+.bld.touch:not(.port) .bld-dpad{width:126px;height:126px}
+.bld.touch:not(.port) .bld-dpad span{width:38px;height:38px}
+.bld.touch:not(.port) .bld-dpad [data-d="jump"]{left:44px;top:3px}.bld.touch:not(.port) .bld-dpad [data-d="d"]{left:44px;bottom:3px}.bld.touch:not(.port) .bld-dpad [data-d="l"]{left:3px;top:44px}.bld.touch:not(.port) .bld-dpad [data-d="r"]{right:3px;top:44px}
+.bld.touch:not(.port) .bld-btns{grid-template-columns:repeat(2,minmax(0,70px));gap:6px}
+.bld.touch:not(.port) .bld-btns button{min-height:40px}
+.bld.port .bld-stage{flex:0 0 auto;margin-top:4px}
+.bld.port .bld-pad{flex:1;align-items:center}
+@media (max-width:560px){.bld-b{font-size:10px;padding:5px 6px;margin:2px}.bld-b small{display:none}.bld-t{display:none}.bld-top{justify-content:space-between;padding-left:6px;padding-right:6px}}
+@media (max-width:360px){.bld-dpad{width:128px;height:128px}.bld-dpad span{width:40px;height:40px}.bld-dpad [data-d="jump"]{left:44px}.bld-dpad [data-d="d"]{left:44px}.bld-dpad [data-d="l"],.bld-dpad [data-d="r"]{top:44px}.bld-btns{grid-template-columns:repeat(2,minmax(0,68px))}}
+@media (prefers-reduced-motion:reduce){.bl-rec{animation:none}}
+/* BALADE 640×360 : en paysage tactile, la barre du haut flotte dans la marge gauche (le canevas garde toute la hauteur) */
+.bld.touch:not(.port) .bld-top{position:absolute;top:0;left:0;z-index:3;width:auto;max-width:none;flex-direction:column;align-items:stretch;gap:2px;padding:max(6px,env(safe-area-inset-top)) 4px 4px max(4px,env(safe-area-inset-left))}
+.bld.touch:not(.port) .bld-t{display:none}
+.bld.touch:not(.port) .bld-b{font-size:10px;padding:4px 6px;opacity:.85}
+.bld.touch:not(.port) .bld-b small{display:none}
+.bld.nohelp .bld-help{display:none}
+.bld.ovtop .bld-top{position:absolute;top:0;left:0;right:0;margin:0 auto;z-index:3;opacity:0;transition:opacity .2s;background:rgba(7,5,12,.96);box-shadow:0 2px 0 #2a2140}
+.bld.ovtop .bld-top:hover,.bld.ovtop .bld-top:focus-within{opacity:1}
+@media (prefers-reduced-motion:reduce){.bld.ovtop .bld-top{transition:none}}
